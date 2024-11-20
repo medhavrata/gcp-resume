@@ -21,27 +21,27 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.0.0  # Specify the Terraform version
-      - name: Write GCP credentials to file 
-        run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" | base64 --decode > $HOME/gcp-key.json
+      # - name: Write GCP credentials to file 
+      #   run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" | base64 --decode > $HOME/gcp-key.json
 
-      - name: Authenticate to GCP 
-        run: gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+      # - name: Authenticate to GCP 
+      #   run: gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
 
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
       - name: Terraform Plan
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: terraform plan
         working-directory: terraform
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
 
       - name: Terraform Apply
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: terraform apply -auto-approve
         working-directory: terraform
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
 
   build:
     runs-on: ubuntu-latest
@@ -55,7 +55,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: resume-project-436919  # Replace with your Google Cloud project ID
-          service_account_key: $HOME/gcp-key.json
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
         
       - name: Deploy to GCS

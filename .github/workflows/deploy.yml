@@ -23,6 +23,11 @@ jobs:
           terraform_version: 1.0.0  # Specify the Terraform version
       - name: Write GCP credentials to file 
         run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > $HOME/gcp-key.json
+        shell: bash
+
+      - name: Check if GCP secret exists
+        run: ls -l $HOME/gcp-key.json
+        shell: bash
 
       # - name: Authenticate to GCP 
       #   run: gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
